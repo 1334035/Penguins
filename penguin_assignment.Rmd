@@ -1,0 +1,109 @@
+---
+title: "penguin_assignment"
+output: html_document
+date: "2022-12-06"
+---
+
+## This rmd provides code to load palmerpenguin data, clean it, runs a statistical test on the data, plots the figure from this test and saves the figure as a png file and a svg file. 
+## Set working directory 
+```{r}
+setwd("/Users/R/penguinproject")
+```
+
+
+## Load the libraries from my files 
+```{r}
+source("functions/libraries.r")
+```
+
+# Load the functions from my files 
+```{r}
+source("functions/cleaning.r")
+source("functions/plotting.r")
+```
+
+# Load the data
+```{r}
+penguins_raw <- read.csv("data_raw/penguins_raw.csv")
+```
+
+
+# Clean the data 
+
+## Fix the column names, remove empty rows, remove columns called comment and delta 
+```{r}
+penguins_clean <- cleaning(penguins_raw)
+
+```
+## Save the clean data
+```{r}
+write.csv(penguins_clean, "data_clean/penguins_clean.csv")
+```
+
+
+## Use the function to remove rows that have NA for either flipper or mass data and remove everything excepts species, body mass and flipper length data. 
+```{r}
+penguins_mass_and_flippers <- remove_empty_flipper_and_mass(penguins_clean)
+head(penguins_mass_and_flippers)
+```
+
+
+# Statistical Test - Linear regression 
+### Null hypothesis: flipper length cannot be predicted from body mass in penguins 
+
+```{r results='hide'}
+penguin_mod1 <- lm(flipper_length_mm ~ body_mass_g, penguins_mass_and_flippers)
+
+summary(penguin_mod1)
+```
+
+### ANOVA test on the linear regression 
+```{r}
+anova(penguin_mod1)
+```
+#### The P value is below 0.05 this means we can reject the null hypothesis and therefore can conclude that body mass can be used to predict flipper length in penguins. 
+
+
+##Plotting the model 
+```{r}
+scattergraph_penguins <- plot_penguin_figure(penguins_mass_and_flippers)
+scattergraph_penguins
+```
+
+
+
+# Save figures
+##save the figure as a svg file
+```{r}
+save_scattergraph_svg(penguins_mass_and_flippers, 
+                      "figures/fig01_vector.svg", 
+                      size = 15, scaling = 1)
+```
+
+
+
+##Save the figure for a report 
+```{r}
+save_scattergraph_png(penguins_mass_and_flippers, 
+                      "figures/fig01_report.png", 
+                      size = 15, res = 600, scaling=1)
+```
+
+##Save the figure for a presentation
+```{r}
+save_scattergraph_png(penguins_mass_and_flippers, 
+                      "figures/fig01_powerpoint.png", 
+                      size = 15, res = 600, scaling=1.4)
+```
+
+##Save the figure for a poster 
+```{r}
+save_scattergraph_png(penguins_mass_and_flippers, 
+                      "figures/fig01_poster.png", 
+                      size = 30, res = 600, scaling=2.8)
+```
+
+
+
+
+
